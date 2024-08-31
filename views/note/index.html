@@ -1,0 +1,186 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>PlantDad/Notes</title>
+    <link rel="preload" href="/style/style.css" as="style" />
+    <link rel="preload" href="/script/site.js" as="script" />
+    <link rel="stylesheet" type="text/css" href="/style/style.css" />
+    <link rel="icon" href="/images/plant_dad.ico" />
+    <script src="/script/site.js" defer></script>
+    <style>
+      .active:after {
+        content: "\2212";
+      }
+    </style>
+  </head>
+
+  <body>
+    <nav class="navbar" id="navb"></nav>
+    <% if (typeof plant != "undefined"){ %>
+    <section>
+      <table class="center viewPlant">
+        <tr>
+          <td class="image-col">
+            <img
+              src="<%= plant.img %>"
+              alt="Image not found"
+              onclick="popupIMG(<%=plant.id%>)"
+              id="myImg_<%=plant.id%>"
+            />
+            <!-- The Modal -->
+            <div id="myModal_<%=plant.id%>" class="modal">
+              <!-- The Close Button -->
+              <span id="close_<%=plant.id%>" class="close">&times;</span>
+
+              <!-- Modal Content (The Image) -->
+              <img class="modal-content" id="img01_<%=plant.id%>" />
+            </div>
+          </td>
+          <td><%= plant.name %></td>
+          <td><%= plant.date %></td>
+        </tr>
+        <tr></tr>
+      </table>
+    </section>
+    <%}%>
+
+    <section class="center">
+      <div class="top-text center-text">
+        <h1>NOTES</h1>
+        <div class="center top-btn-container">
+          <form action="/note/clear" method="post">
+            <input
+              type="submit"
+              class="btn btn-delete"
+              value="Clear All Notes"
+            />
+          </form>
+          <form action="/soil/clear" method="post">
+            <input
+              type="submit"
+              class="btn btn-delete"
+              value="Clear All Soil Recipies"
+            />
+          </form>
+          <input
+            type="button"
+            class="btn btn-add"
+            onclick="location.href='/note/create';"
+            value="Create New Note"
+          />
+        </div>
+      </div>
+
+      <table class="center listall">
+        <% if (note_list.length > 0) { for (var i = 0; i < note_list.length;
+        i++) { %>
+
+        <tr>
+          <td>
+            <button class="collapsible">
+              <%=i + 1%>: <%=note_list[i].title%> <%=note_list[i].date%>
+            </button>
+            <div class="content">
+              <table class="listall">
+                <tr>
+                  <% for (var key of Object.keys(note_list[i])) { %>
+                  <td><%=key%></td>
+                  <% } %>
+                  <td>
+                    <div>
+                      <input
+                        type="hidden"
+                        name="id"
+                        value=" <%= note_list[i].id %> "
+                      />
+                      <input
+                        type="button"
+                        class="btn btn-view"
+                        onclick="location.href='/note/edit/<%= note_list[i].id%>';"
+                        value="Edit"
+                      />
+
+                      <input
+                        form="deleteNote"
+                        type="hidden"
+                        name="noteId"
+                        value="<%= note_list[i].id%> "
+                      />
+
+                      <input
+                        type="button"
+                        onclick="deleteNote(<%= note_list[i].id%>)"
+                        class="btn btn-delete"
+                        value="&#128465;"
+                      />
+                    </div>
+                  </td>
+                  
+                </tr>
+                <tr>
+                  <% for (var value of Object.values(note_list[i])) { %>
+                  <td><%=value%></td>
+                  <% } %>
+                </tr>
+                <tr>
+                  <td colspan=7>
+                    <table class="listall">
+                      <tr>
+                        <th>Ingredient</th>
+                        <th>Weight (g)</th>
+                        <th>N (%)</th>
+                        <th>P (%)</th>
+                        <th>K (%)</th>
+                      </tr>
+                      <% if (typeof soil_compositions !== "undefined"){ %> <% for
+                      (var soil of soil_compositions){ %> <% if (soil.noteId ==
+                      note_list[i].id) { %>
+                      <tr>
+                        <td><%= soil.Ingredient %></td>
+                        <td><%= soil.Weight %></td>
+                        <td><%= soil.N %></td>
+                        <td><%= soil.P %></td>
+                        <td><%= soil.K %></td>
+                      </tr>
+                      <%}%><%}%><%}%>
+                    </table>
+                  </td>
+                  
+                </tr>
+              </table>
+            </div>
+          </td>
+        </tr>
+
+        <% }} %>
+      </table>
+
+      <form id="deleteNote" method="post"></form>
+      <% if (typeof message !== "undefined" && message !== "") { %>
+
+      <div class="popup">
+        <span class="popuptext" id="myPopup" onclick="hidePopup(this)"
+          ><%=message%></span
+        >
+      </div>
+      <% } %>
+    </section>
+
+    <script>
+      var coll = document.getElementsByClassName("collapsible");
+      for (var i = 0; i < coll.length; i++) {
+        coll[i].addEventListener("click", function () {
+          this.classList.toggle("active");
+          var content = this.nextElementSibling;
+          if (content.style.maxHeight) {
+            content.style.maxHeight = null;
+          } else {
+            content.style.maxHeight = content.scrollHeight + "px";
+          }
+        });
+      }
+    </script>
+  </body>
+</html>

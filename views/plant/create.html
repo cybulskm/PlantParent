@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>PlantDad/Create</title>
+    <script src="/public/site.js" defer></script>
+    <link rel="preload" href="/style/style.css" as="style" />
+    <link rel="preload" href="/script/site.js" as="script" />
+    <link rel="stylesheet" type="text/css" href="/style/style.css" />
+    <script src="/script/site.js" defer></script>
+  </head>
+
+  <body>
+    <nav class="navbar" id="navb"></nav>
+    <div class="top-text">
+      <h1>CREATE PLANT</h1>
+    </div>
+    <div class="center center-text">
+      <form action="/plant/create" method="post" enctype="multipart/form-data">
+        <table class="create-plant">
+          <tr>
+            <th>Image</th>
+            <td>
+              <input type="file" name="file" />
+            </td>
+          </tr>
+          <tr>
+            <th>Name</th>
+            <td>
+              <input type="text" name="Name" />
+            </td>
+          </tr>
+          <tr>
+             <th>Yeild</th>
+            <td>
+              <input type="number" name="Yield" />
+            </td>
+          </tr>
+          <tr>
+            <th>Strain</th>
+            <td>
+              <input type="text" name="Strain" />
+            </td>
+          </tr>
+          <tr>
+            <th>Date Planted</th>
+            <td>
+              <input type="date" name="DatePlanted" />
+            </td>
+          </tr>
+          <tr>
+            <td colspan=2 class="center">
+               <input class="btn btn-submit" type="submit" value="Submit" />
+            </td>
+          </tr>
+        </table>
+       
+      </form>
+    </div>
+  </body>
+</html>

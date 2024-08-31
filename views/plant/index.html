@@ -1,0 +1,135 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>PlantDad/Plants</title>
+        <link rel="preload" href="/style/style.css" as="style" />
+        <link rel="preload" href="/script/site.js" as="script" />
+        <link rel="stylesheet" type="text/css" href="/style/style.css" />
+        <link rel="icon" href="/images/plant_dad.ico" />
+        <script src="/script/site.js" defer></script>
+    </head>
+
+    <body>
+        <nav class="navbar" id="navb"></nav>
+        <div class="top-text">
+            <h1>PLANTS</h1>
+            <div class="center top-btn-container">
+                <form action="/plant/clear" method="post">
+                    <input
+                        type="submit"
+                        class="btn btn-delete"
+                        value="Clear All"
+                    />
+                </form>
+                <input
+                    type="button"
+                    class="btn btn-add"
+                    onclick="location.href='/plant/create';"
+                    value="Add New Plant"
+                />
+            </div>
+        </div>
+
+        <div>
+            <table class="listall">
+                <%if (typeof plant_list !== "undefined" && plant_list.length >
+                0) { %>
+                <tr>
+                    <% for (var key of Object.keys(plant_list[0])) {%>
+                    <th><%=key%></th>
+                    <%}%>
+                </tr>
+                <%plant_list.forEach(function (plant) { %>
+                <tr>
+                    <% for (var i = 0; i < Object.values(plant).length; i++) {
+                    %> <%if (i == 1){%>
+                    <td class="image-col">
+                        <%if (typeof plant.img !== 'undefined') { %>
+                        <img
+                            src="<%= plant.img %>"
+                            alt="Image not found"
+                            onclick="popupIMG(<%= plant.id %>)"
+                            id="myImg_<%= plant.id %>"
+                        />
+                            <!-- Modal -->
+                            <div id="myModal_<%= plant.id %>" class="modal">
+                                <span id="close_<%= plant.id %>" class="close"
+                                    >&times;</span
+                                >
+                                <img
+                                    class="modal-content"
+                                    id="img01_<%= plant.id %>"
+                                />
+                            </div>
+                        <% } %>
+
+                       
+                        <% } else { %>
+                    </td>
+
+                    <td><%=Object.values(plant)[i]%></td>
+                    <% }%> <%}%>
+                    <td>
+                        <input
+                            type="button"
+                            class="btn btn-view"
+                            onclick="location.href='/note/index/<%= plant.id %>';"
+                            value="View Notes"
+                        />
+                        <input
+                            type="button"
+                            onclick="deletePlant(<%= plant.id %>)"
+                            class="btn btn-delete"
+                            value="&#128465;"
+                        />
+                    </td>
+                </tr>
+                <%})%><%}%>
+                <tr>
+                    <form
+                        action="/plant/create"
+                        method="post"
+                        enctype="multipart/form-data"
+                    >
+                        <td><%=plant_list.length + 1%></td>
+                        <td>
+                            <input type="file" name="file" />
+                        </td>
+                        <td>
+                            <input type="text" name="Name" />
+                        </td>
+                        <td>
+                            <input type="text" name="Strain" />
+                        </td>
+                        <td>
+                            <input type="date" name="DatePlanted" />
+                        </td>
+                        <td>
+                            <input type="number" name="Yield" />
+                        </td>
+
+                        <td>
+                            <input
+                                class="btn btn-submit"
+                                type="submit"
+                                value="Submit"
+                            />
+                        </td>
+                    </form>
+                </tr>
+            </table>
+        </div>
+        <form id="deletePlant" method="post"></form>
+
+        <%if (typeof message !== "undefined" && message !== "") { %>
+
+        <div class="popup">
+            <span class="popuptext" id="myPopup" onclick="hidePopup(this)"
+                ><%=message%></span
+            >
+        </div>
+        <%}%>
+    </body>
+</html>

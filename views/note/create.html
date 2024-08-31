@@ -1,0 +1,251 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>PlantDad/Create Note</title>
+        <script src="/public/site.js" defer></script>
+        <link rel="preload" href="/style/style.css" as="style" />
+        <link rel="preload" href="/script/site.js" as="script" />
+        <link rel="stylesheet" type="text/css" href="/style/style.css" />
+        <link rel="icon" href="/images/plant_dad.ico" />
+        <script src="/script/site.js" defer></script>
+    </head>
+
+    <body>
+        <nav class="navbar" id="navb"></nav>
+        <div class="top-text">
+            <h1>CREATE NOTE</h1>
+        </div>
+
+        <div class="center center-text">
+            <form
+                action="/note/create"
+                method="post"
+                enctype="multipart/form-data"
+                id="note-form"
+            >
+                <table class="create-plant" id="note-table">
+                    <tr>
+                        <th colspan="1">Plant:</th>
+                        <td colspan="5">
+                            <select name="plantId" id="plantId">
+                                <%if (typeof plant_list !== "undefined"){%> <%
+                                plant_list.forEach(function (plant) {%>
+                                <option value="<%= plant.id %>">
+                                    <%=plant.Name%>
+                                </option>
+                                <%})%><%}%>
+                            </select>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td colspan="2">
+                            <input type="file" id="fileInput" name="img" />
+                        </td>
+                        <td colspan="3">
+                            <label for="Title">Title:</label><br />
+                            <input id="Title" type="text" name="Title" />
+                            <br />
+                            <label for="Date">Date:</label>
+                            <br />
+                            <input id="Date" type="Date" name="Date" />
+                            <br />
+                            <label for="Height">Height (cm):</label>
+                            <br />
+                            <input id="Height" type="text" name="Height" />
+                        </td>
+                    </tr>
+                    <tr>
+                        <th colspan="2">Soil Composition</th>
+                        <th colspan="3" class="center-text">%</th>
+                    </tr>
+
+                    <tr>
+                        <th>Ingredient</th>
+                        <th>Weight (g)</th>
+                        <td>N</td>
+                        <td>P</td>
+                        <td>K</td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <input
+                                type="text"
+                                id="ingredient"
+                                name="Ingredient[]"
+                            />
+                        </td>
+                        <td>
+                            <input
+                                type="number"
+                                class="weight"
+                                id="weight"
+                                name="Weight[]"
+                            />
+                        </td>
+                        <td>
+                            <input type="number" class="n" id="n" name="N[]" />
+                        </td>
+                        <td>
+                            <input type="number" class="p" id="p" name="P[]" />
+                        </td>
+                        <td>
+                            <input type="number" class="k" id="k" name="K[]" />
+                        </td>
+                        <td>
+                            <input
+                                type="button"
+                                class="btn btn-add"
+                                onclick="addRow()"
+                                value="&#43;"
+                            />
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>Total:</td>
+                        <td id="totalweight"></td>
+                        <td id="ntotal"></td>
+                        <td id="ptotal"></td>
+                        <td id="ktotal"></td>
+                    </tr>
+
+                    <tr>
+                        <td colspan="6">
+                            <label for="Description">General Comments:</label
+                            ><br />
+                            <input
+                                type="text"
+                                name="Description"
+                                id="Description"
+                            />
+                        </td>
+                    </tr>
+                    <tr>
+                        <td colspan="6" class="center">
+                            <input
+                                class="btn btn-submit"
+                                type="button"
+                                value="Add"
+                                onclick="formParse()"
+                            />
+                        </td>
+                    </tr>
+                </table>
+            </form>
+        </div>
+
+        <div class="popup" id="popup">
+            <span
+                class="popuptext"
+                id="myPopup"
+                style="display: none"
+                onclick="hidePopup(this)"
+                >Please fill all the fields</span
+            >
+        </div>
+        <script>
+            function deleteRow(){
+                var i = document.getElementById("table").rows.length;
+                document.getElementById("table").deleteRow(i-1);
+            }
+            var weightlist = [];
+            var ingredientlist = [];
+            var klist = [];
+            var nlist = [];
+            var plist = [];
+
+            function formParse() {
+                console.log("FORM PARSED");
+                var form = document.getElementById("note-form");
+
+                // Create hidden input fields for each list to submit as part of the form
+                addHiddenFields(form, "Ingredient", ingredientlist);
+                addHiddenFields(form, "Weight", weightlist);
+                addHiddenFields(form, "K", klist);
+                addHiddenFields(form, "P", plist);
+                addHiddenFields(form, "N", nlist);
+
+                form.submit();
+            }
+
+            function addHiddenFields(form, name, values) {
+                values.forEach((value) => {
+                    let input = document.createElement("input");
+                    input.type = "hidden";
+                    input.name = name;
+                    input.value = value;
+                    form.appendChild(input);
+                });
+            }
+
+            var totalp = 0;
+            var totalk = 0;
+            var totaln = 0;
+            var totalw = 0;
+
+            function addRow() {
+                var table = document.getElementById("note-table");
+                var n = document.getElementById("n");
+                var p = document.getElementById("p");
+                var k = document.getElementById("k");
+                var weight = document.getElementById("weight");
+                var ingredient = document.getElementById("ingredient");
+
+                if (
+                    n.value == "" ||
+                    p.value == "" ||
+                    k.value == "" ||
+                    weight.value == "" ||
+                    ingredient.value == ""
+                ) {
+                    alert("Please fill in all the fields");
+                } else {
+                    ingredientlist.push(ingredient.value);
+                    weightlist.push(weight.value);
+                    nlist.push(n.value);
+                    klist.push(k.value);
+                    plist.push(p.value);
+                    console.log(nlist);
+
+                    var row = table.insertRow(5);
+                    var totalweighthtml =
+                        document.getElementById("totalweight");
+                    var totalnhtml = document.getElementById("ntotal");
+                    var totalphtml = document.getElementById("ptotal");
+                    var totalkhtml = document.getElementById("ktotal");
+
+                    totalw += parseFloat(weight.value);
+                    totalk += parseFloat(k.value);
+                    totalp += parseFloat(p.value);
+                    totaln += parseFloat(n.value);
+
+                    totalweighthtml.innerHTML = totalw;
+                    totalnhtml.innerHTML = totaln;
+                    totalkhtml.innerHTML = totalk;
+                    totalphtml.innerHTML = totalp;
+
+                    var cell1 = row.insertCell(0);
+                    var cell2 = row.insertCell(1);
+                    var cell3 = row.insertCell(2);
+                    var cell4 = row.insertCell(3);
+                    var cell5 = row.insertCell(4);
+                    var cell6 = row.insertCell(5);
+
+                    cell1.innerHTML = ingredient.value;
+                    ingredient.value = "";
+                    cell2.innerHTML = weight.value;
+                    weight.value = "";
+                    cell3.innerHTML = n.value;
+                    n.value = "";
+                    cell4.innerHTML = p.value;
+                    p.value = "";
+                    cell5.innerHTML = k.value;
+                    k.value = "";
+                    cell6.innerHTML =
+                        "<input type='button' class='btn btn-delete' onclick='deleteRow()' value='&#8722;'/>";
+                }
+            }
+        </script>
+    </body>
+</html>
